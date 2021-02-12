@@ -48,7 +48,7 @@ class Venue(db.Model):
     Show = db.relationship('Show', backref='venue', lazy = True)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
     def __repr__(self):
-      return f'<Venue {self.id} {self.name}>'
+      return f'<Venue {self.id} {self.name} {self.city}>'
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -257,7 +257,7 @@ def create_venue_submission():
         facebook_link= venue_form_data.facebook_link.data,
         image_link = venue_form_data.image_link.data,
         website = venue_form_data.website.data,
-        seeking_venue = bool(venue_form_data.seeking_venue.data),
+        seeking_talent = bool(venue_form_data.seeking_talent.data),
         seeking_description = venue_form_data.seeking_description.data
     )
     db.session.add(new_venue)
@@ -445,9 +445,22 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
+    venue_edit_form = VenueForm(request.form)
+    venue = Venue.query.get(venue_id)
+    edited_venue = Venue(
+        name = venue_edit_form.name.data,
+        city = venue_edit_form.city.data,
+        state = venue_edit_form.state.data,
+        address = venue_edit_form.address.data
+    )
+    venue.name = edited_venue.name
+    venue.city = edited_venue.city
+    db.session.commit()
+    print(venue)
+
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-  return redirect(url_for('show_venue', venue_id=venue_id))
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
