@@ -252,6 +252,7 @@ def create_venue_submission():
         name= venue_form_data.name.data,
         city= venue_form_data.name.data,
         state= venue_form_data.state.data,
+        address = venue_form_data.address.data,
         genre= venue_form_data.genres.data,
         phone= venue_form_data.phone.data,
         facebook_link= venue_form_data.facebook_link.data,
@@ -420,7 +421,33 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
-
+  artist_edit_form = ArtistForm(request.form)
+  artist = Artist.query.get(artist_id)
+  edited_artist = Artist(
+      name = artist_edit_form.name.data,
+      city = artist_edit_form.city.data,
+      state = artist_edit_form.state.data,
+      genre= artist_edit_form.genres.data,
+      phone= artist_edit_form.phone.data,
+      facebook_link= artist_edit_form.facebook_link.data,
+      image_link = artist_edit_form.image_link.data,
+      website = artist_edit_form.website.data,
+      seeking_venue = bool(artist_edit_form.seeking_venue.data),
+      seeking_description = artist_edit_form.seeking_description.data
+  )
+  artist.name = edited_artist.name
+  artist.city = edited_artist.city
+  artist.state = edited_artist.state
+  artist.address = edited_artist.address
+  artist.genre = edited_artist.genre
+  artist.phone = edited_artist.phone
+  artist.facebook_link = edited_artist.facebook_link
+  artist.image_link = edited_artist.image_link
+  artist.website = edited_artist.website
+  artist.seeking_venue = edited_artist.seeking_venue
+  artist.seeking_description = edited_artist.seeking_description
+  db.session.commit()
+  print(venue)
   return redirect(url_for('edit_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -451,10 +478,26 @@ def edit_venue_submission(venue_id):
         name = venue_edit_form.name.data,
         city = venue_edit_form.city.data,
         state = venue_edit_form.state.data,
-        address = venue_edit_form.address.data
+        address = venue_edit_form.address.data,
+        genre= venue_edit_form.genres.data,
+        phone= venue_edit_form.phone.data,
+        facebook_link= venue_edit_form.facebook_link.data,
+        image_link = venue_edit_form.image_link.data,
+        website = venue_edit_form.website.data,
+        seeking_talent = bool(venue_edit_form.seeking_talent.data),
+        seeking_description = venue_edit_form.seeking_description.data
     )
     venue.name = edited_venue.name
     venue.city = edited_venue.city
+    venue.state = edited_venue.state
+    venue.address = edited_venue.address
+    venue.genre = edited_venue.genre
+    venue.phone = edited_venue.phone
+    venue.facebook_link = edited_venue.facebook_link
+    venue.image_link = edited_venue.image_link
+    venue.website = edited_venue.website
+    venue.seeking_talent = edited_venue.seeking_talent
+    venue.seeking_description = edited_venue.seeking_description
     db.session.commit()
     print(venue)
 
