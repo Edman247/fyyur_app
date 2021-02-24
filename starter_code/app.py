@@ -161,9 +161,6 @@ def show_venue(venue_id):
     upcoming_shows = join_query.filter(Show.start_time > datetime.today()).all()
 
     venue = Venue.query.filter_by(id=venue_id).first_or_404()
-    #for r in join_query:
-    #    join_objects ={}
-    #    join_objects['venue_id'] = r.Venue.id
 
     all_venues = {
         'id': venue.id,
@@ -194,7 +191,6 @@ def show_venue(venue_id):
         'upcoming_shows_count': len(upcoming_shows)
     }
 
-    print(all_venues)
     return render_template('pages/show_venue.html', venue=all_venues)
 
 #  Create Venue
@@ -224,9 +220,7 @@ def create_venue_submission():
     )
     db.session.add(new_venue)
     db.session.commit()
-    body['id'] = new_venue.id
-    body['name'] = new_venue.name
-    print(body['id'])
+
 #TODO: insert form data as a new Venue record in the db, instead
 # TODO: modify data to be the data object returned from db insertion
 
@@ -238,14 +232,27 @@ def create_venue_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     return render_template('pages/home.html')
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<int:venue_id>/delete', methods=['DELETE', 'POST'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+    # TODO: Complete this endpoint for taking a venue_id, and using
+    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    confirm_delete = request.form.get('confirm_delete')
+    venue = Venue.query.get(venue_id)
+    print(venue.name == confirm_delete)
+    try:
+        if (venue.name == confirm_delete):
+            Venue.query.filter_by(id=venue_id).delete()
+            db.session.commit()
+            flash('Venue was successfully deleted!')
+        else:
+            flash('An error occurred. Venue could not be listed.')
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+    # clicking that button delete it from the db then redirect the user to the homepage
+    return render_template('pages/home.html')
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -477,6 +484,27 @@ def create_artist_submission():
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
     return render_template('pages/home.html')
 
+@app.route('/artists/<int:artist_id>/delete', methods=['POST'])
+def delete_artist(artist_id):
+    # TODO: Complete this endpoint for taking a venue_id, and using
+    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    confirm_delete = request.form.get('confirm_delete')
+    artist = Artist.query.get(artist_id)
+    print(artist.name == confirm_delete)
+    try:
+        if (artist.name == confirm_delete):
+            Artist.query.filter_by(id=artist_id).delete()
+            db.session.commit()
+            flash('Artist was successfully deleted!')
+        else:
+            flash('An error occurred. Artist could not be deleted.')
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+    # clicking that button delete it from the db then redirect the user to the homepage
+    return render_template('pages/home.html')
 
 #  Shows
 #  ----------------------------------------------------------------
